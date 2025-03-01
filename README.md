@@ -4,7 +4,8 @@
 
 *An agentic autonomous coding assistant fine tuned for local light-weight LLMS with enhanced features for file management, terminal integration, testing, code refactoring, and project management.*
 
-![ANJ Dev Logo](logo.png)
+![ANJ Dev Logo](https://github.com/user-attachments/assets/a17df1d5-5269-440e-8729-2e924adb0696)
+
 
 ## Overview
 
