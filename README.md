@@ -1,6 +1,6 @@
 # ANJ DEV Terminal
 
-An AI-powered coding assistant with enhanced features for file management, terminal integration, testing, code refactoring, and project management.
+An AI-powered coding assistant fine tuned for local light-weight LLMS with enhanced features for file management, terminal integration, testing, code refactoring, and project management.
 
 ## Overview
 
