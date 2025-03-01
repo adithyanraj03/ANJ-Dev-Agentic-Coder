@@ -202,9 +202,8 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Acknowledgments
 
-- OpenAI, Anthropic, and Google for their AI models
+- Anthropic, and Google for their AI models
 - The Python community for the excellent libraries used in this project
-- All contributors who have helped improve this tool
 
 ## License
 
