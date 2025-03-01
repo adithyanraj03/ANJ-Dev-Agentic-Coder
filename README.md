@@ -1,10 +1,41 @@
-# ANJ DEV Terminal
+# ANJ-Dev-Agentic-Coder
 
-An AI-powered coding assistant fine tuned for local light-weight LLMS with enhanced features for file management, terminal integration, testing, code refactoring, and project management.
+# ANJ Dev
+
+*An agentic autonomous coding assistant fine tuned for local light-weight LLMS with enhanced features for file management, terminal integration, testing, code refactoring, and project management.*
+
+![ANJ Dev Logo](logo.png)
 
 ## Overview
 
-ANJ DEV Terminal is a comprehensive development environment that combines the power of AI with a rich set of features to streamline your coding workflow. It provides an integrated terminal experience with advanced capabilities for editing, testing, and managing your code.
+ANJ Dev is an autonomous coding agent that integrates with lightweight local LLMs to provide coding assistance that respects your workflow and privacy. The agent can create and edit files, run commands, browse the web, and perform various development tasks - all while seeking your permission at each step.
+
+## Purpose
+
+The main purpose of ANJ Dev is to provide deep insights into how LLMs interact with agentic programming frameworks. By exposing the backend processes through comprehensive logging, the system allows developers to:
+
+- Observe how the LLM responds to agent instructions in real-time
+- Understand the detailed inner workings of the agent-LLM interaction
+- View both the agent logs and LLM Studio logs simultaneously
+- Optimize prompt engineering and agent architecture based on live observations
+- Study the decision-making process of AI agents with full transparency
+- Develop more efficient and effective agentic systems through empirical analysis
+
+This transparency makes ANJ Dev an invaluable tool for both development and research purposes, enabling clearer optimization paths and better understanding of autonomous AI systems.
+
+## Key Features
+
+- **Works with Local LLMs**: Designed to integrate seamlessly with lightweight local language models
+- **Permission-Based Actions**: Always asks for your approval before taking actions on your system
+- **File Management**: Creates, edits, and organizes files based on your requirements
+- **Command Execution**: Runs terminal commands to help with development tasks
+- **Persistent Memory**: Maintains context across sessions with a local memory store
+- **Browser Integration**: Can search the web for solutions and documentation when needed
+- **Session Management**: Create new sessions or resume previous ones as needed
+- **Transparent Logging**: Comprehensive logging of both agent operations and LLM responses
+
+## Getting Started
+
 
 ## Features
 
@@ -50,30 +81,12 @@ ANJ DEV Terminal is a comprehensive development environment that combines the po
 - **Debugging Assistance**: Get suggestions for fixing runtime errors
 - **Learning from Edits**: Session context updates when files are modified
 
-## Installation
+### Prerequisites
 
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/anj-dev-terminal.git
-cd anj-dev-terminal
-```
-
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-3. Configure your settings in `config.json`
-
-## Usage
-
-Launch the terminal by running:
-
-```bash
-python launch_terminal.py
-```
-
-For detailed usage instructions, see [How to Run](how_to_run.md).
+- Python 3.8+
+- Local LLM setup (compatible with various providers)
+- Required Python packages (see `requirements.txt`)
+- For JavaScript/TypeScript support: Node.js and npm/yarn
 
 ## Configuration
 
@@ -86,19 +99,60 @@ ANJ DEV Terminal can be customized through the `config.json` file. You can confi
 - Keyboard shortcuts
 - And more
 
-## Requirements
 
-- Python 3.8 or higher
-- Curses-compatible terminal
-- For JavaScript/TypeScript support: Node.js and npm/yarn
+### Installation
+
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/adithyanraj03/ANJ-Dev-Agentic-Coder.git
+   cd anjdev
+   ```
+
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Configure your LLM provider in the settings
+
+### Usage
+
+Run the application:
+```bash
+python launch_terminal.py
+```
+
+The application will:
+1. Display the ANJ Dev logo
+2. Ask if you want to create a subfolder for your project
+3. Automatically create a memory folder to maintain context
+4. Present the main interface with options:
+   - New Session
+   - Resume Session
+   - Toggle Log Window
+   - Provider Settings
+
+## Current Status & Roadmap
+
+### Current Capabilities
+- Basic UI with session management
+- LLM integration for code generation
+- File creation functionality
+- Local memory storage
+- Live logging of agent and LLM interactions
+
+### Under Development
+- Improved context awareness
+- More robust codebase analysis
+- Enhanced file manipulation
+- Command execution reliability
+- Better agent reasoning and planning
+- Extended browsing capabilities
+- Advanced metrics for LLM-agent interaction analysis
 
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Acknowledgments
 
@@ -106,5 +160,9 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - The Python community for the excellent libraries used in this project
 - All contributors who have helped improve this tool
 
+## License
 
-//AIzaSyAPYOyIAAD_lvVm7rWE43x_YAuEtbl60HE
+This project is licensed under the GNU General Public License v3.0 (GPL-3.0) - see the LICENSE file for details.
+
+
+
