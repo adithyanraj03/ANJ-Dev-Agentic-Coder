@@ -23,6 +23,7 @@ The main purpose of ANJ Dev is to provide deep insights into how LLMs interact w
 
 This transparency makes ANJ Dev an invaluable tool for both development and research purposes, enabling clearer optimization paths and better understanding of autonomous AI systems.
 
+## Getting Started
 ## Key Features
 
 - **Works with Local LLMs**: Designed to integrate seamlessly with lightweight local language models
@@ -34,10 +35,8 @@ This transparency makes ANJ Dev an invaluable tool for both development and rese
 - **Session Management**: Create new sessions or resume previous ones as needed
 - **Transparent Logging**: Comprehensive logging of both agent operations and LLM responses
 
-## Getting Started
 
-
-## Features
+## Features in Detail
 
 ### File Management
 
