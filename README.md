@@ -143,8 +143,7 @@ ANJ DEV Terminal can be customized through the `config.json` file. You can confi
    
    5.Toggle Log Viwer for better Understanding 
    ![image](https://github.com/user-attachments/assets/b058747e-3ff0-40fb-876c-bb0ce5d7a555)
-<br>
-   6.New Session Enter the request (example :create a snake game using python ) [Accept (y) , Reject (n) , Edit (e) ]<br>
+   6.New Session Enter the request (example :create a snake game using python ) [Accept (y) , Reject (n) , Edit (e) ]
    <img width="950" alt="image" src="https://github.com/user-attachments/assets/30b96ae5-12e7-40b6-8ad9-f99cb894863f" />
    ![image](https://github.com/user-attachments/assets/79d91130-efa4-46b7-aa5b-baf67d0bc0f1)
    ![image](https://github.com/user-attachments/assets/6eead0da-5ba3-413a-9c96-dafdf35fcb6c)
