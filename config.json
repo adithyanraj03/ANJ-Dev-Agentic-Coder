@@ -1,0 +1,86 @@
+{
+  "llm_providers": {
+    "local": {
+      "url": "http://localhost:1234/v1",
+      "active": true,
+      "models": [
+        "qwen2.5-coder-3B",
+        "codellama-7b-instruct",
+        "deepseek-qwen2.5-3b-webinstruct-cft-50k",
+        "phi-3.1-mini-128k-instruct",
+        "phi-3-mini-4k-instruct"
+      ],
+      "timeout": null,
+      "active_models": [
+        "phi-3.1-mini-128k-instruct"
+      ]
+    },
+    "vscode": {
+      "active": false,
+      "extension_id": "GitHub.copilot",
+      "timeout": 10
+    },
+    "gemini": {
+      "active": false,
+      "api_key": "AIzaSyC49pe_3Kr8AnXk80ZYo76Lzah5OkR0h6w",
+      "model": "gemini-2.0-flash-lite-preview",
+      "timeout": 30,
+      "models": [
+        "gemini-2.0-flash",
+        "gemini-2.0-flash-lite-preview",
+        "gemini-1.5-flash",
+        "gemini-pro",
+        "gemini-1.5-pro"
+      ],
+      "active_models": [
+        "gemini-2.0-flash",
+        "gemini-2.0-flash-lite-preview"
+      ]
+    },
+    "openroute": {
+      "active": false,
+      "api_key": "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",
+      "base_url": "https://openrouter.ai/api/v1",
+      "model": "openrouter/auto",
+      "timeout": 30,
+      "models": [
+        "openrouter/auto",
+        "mistralai/mistral-7b-instruct",
+        "nousresearch/nous-hermes-2-mixtral-8x7b-dpo",
+        "anthropic/claude-3-haiku",
+        "google/gemma-7b-it"
+      ]
+    }
+  },
+  "use_log_window": false,
+  "anti_loop": {
+    "max_iterations": 5,
+    "max_response_size": 10000,
+    "pattern_threshold": 0.8
+  },
+  "ui": {
+    "enable_animations": true,
+    "animation_speed": 0.05,
+    "symbols": {
+      "success": "(✓)",
+      "error": "(✗)",
+      "warning": "(!)",
+      "info": "(>)",
+      "bullet": "•",
+      "arrow": "->"
+    },
+    "colors": {
+      "title": "cyan",
+      "prompt": "green",
+      "success": "green",
+      "error": "red",
+      "warning": "yellow",
+      "info": "blue"
+    }
+  },
+  "deployment": {
+    "backup_before_deploy": true,
+    "auto_cleanup": false,
+    "max_deployments": 10
+  }
+}

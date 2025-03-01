@@ -1,0 +1,179 @@
+LOGGING PATCH
+
+To enhance the logging for better debugging, add these lines to the beginning of launch_terminal.py:
+
+import logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    handlers=[
+        logging.FileHandler("agent_debug.log"),
+        logging.StreamHandler()
+    ]
+)
+
+# Log startup
+logging.info("Starting ANJ DEV Terminal")
+
+-------------------------------------------------
+
+Modify the log_window.py to make it display raw logs by adding this to the colors dictionary:
+
+        self.colors = {
+            'INFO': QColor(200, 200, 200),    # Light gray
+            'SUCCESS': QColor(0, 255, 0),      # Green
+            'WARNING': QColor(255, 255, 0),    # Yellow
+            'ERROR': QColor(255, 50, 50),      # Red
+            'DEBUG': QColor(100, 150, 255),    # Light blue
+            'JSON': QColor(255, 200, 100),     # Orange for JSON
+            'TIMESTAMP': QColor(150, 150, 150), # Dark gray
+            'SEPARATOR': QColor(100, 100, 100), # Divider color
+            'RAW': QColor(180, 180, 180),      # Light gray for raw data
+            'COMMAND': QColor(0, 255, 255),    # Cyan for commands
+        }
+
+-------------------------------------------------
+
+Modify the add_log method in log_window.py to include more raw data:
+
+def add_log(self, message: dict):
+    """Add a new log message to display with enhanced raw data."""
+    try:
+        level = message.get('level', 'INFO')
+        text = message.get('message', '')
+        raw_data = message.get('raw_data', None)
+        
+        # Get document and cursor
+        document = self.log_display.document()
+        cursor = QTextCursor(document)
+        cursor.movePosition(QTextCursor.End)
+        cursor.beginEditBlock()
+        
+        # Add timestamp with color
+        timestamp = datetime.now().strftime('%H:%M:%S.%f')[:-3]  # Include milliseconds
+        fmt = QTextCharFormat()
+        fmt.setForeground(self.colors['TIMESTAMP'])
+        cursor.insertText(f"[{timestamp}] ", fmt)
+        
+        # Increment log count and update status
+        self.log_count += 1
+        self.update_status()
+        
+        # Add level with color
+        fmt.setForeground(self.colors.get(level, self.colors['INFO']))
+        cursor.insertText(f"{level}: ", fmt)
+        
+        # Handle special formatting for JSON, raw responses and various data types
+        if "Raw" in text or "raw data" in text.lower() or raw_data:
+            self._format_raw_content(cursor, text, raw_data)
+        # Special formatting for action start/end
+        elif text.startswith("=== START:") or text.startswith("=== END:"):
+            # Format action headers with bold + color
+            fmt.setFontWeight(QFont.Bold)
+            if "START:" in text:
+                fmt.setForeground(QColor(100, 255, 100))  # Bright green
+            else:
+                if "(SUCCESS)" in text:
+                    fmt.setForeground(QColor(100, 255, 100))  # Bright green
+                else:
+                    fmt.setForeground(QColor(255, 100, 100))  # Bright red
+            
+            cursor.insertText(text + '\n', fmt)
+        # Special formatting for files and paths
+        elif ": /" in text or text.endswith(".py") or text.endswith(".json"):
+            parts = text.split(": ", 1)
+            if len(parts) > 1:
+                # Format the description part
+                fmt.setForeground(self.colors.get(level, self.colors['INFO']))
+                cursor.insertText(f"{parts[0]}: ", fmt)
+                
+                # Format the path part
+                fmt.setForeground(QColor(255, 200, 100))  # Orange for paths
+                cursor.insertText(f"{parts[1]}\n", fmt)
+            else:
+                fmt.setForeground(self.colors.get(level, self.colors['INFO']))
+                cursor.insertText(text + '\n', fmt)
+        # Commands
+        elif text.startswith("Running command:") or text.startswith("Command:"):
+            parts = text.split(": ", 1)
+            if len(parts) > 1:
+                # Format the description part
+                fmt.setForeground(self.colors.get(level, self.colors['INFO']))
+                cursor.insertText(f"{parts[0]}: ", fmt)
+                
+                # Format the command part
+                fmt.setForeground(self.colors['COMMAND'])
+                cursor.insertText(f"{parts[1]}\n", fmt)
+            else:
+                fmt.setForeground(self.colors.get(level, self.colors['INFO']))
+                cursor.insertText(text + '\n', fmt)
+        else:
+            fmt.setForeground(self.colors.get(level, self.colors['INFO']))
+            cursor.insertText(text + '\n', fmt)
+        
+        # Add separator
+        fmt.setForeground(self.colors['SEPARATOR'])
+        cursor.insertText('-' * 80 + '\n', fmt)
+        
+        cursor.endEditBlock()
+        
+        # Scroll to bottom if near bottom
+        sb = self.log_display.verticalScrollBar()
+        if sb.value() >= sb.maximum() - 10:
+            sb.setValue(sb.maximum())
+        
+    except Exception as e:
+        print(f"Error adding log: {e}")
+        
+def _format_raw_content(self, cursor, text, raw_data=None):
+    """Format raw content with better formatting and syntax highlighting."""
+    fmt = QTextCharFormat()
+    
+    # Add header
+    fmt.setForeground(self.colors['DEBUG'])
+    cursor.insertText(f"{text}\n", fmt)
+    
+    # Format raw data if provided
+    if raw_data:
+        try:
+            if isinstance(raw_data, dict) or isinstance(raw_data, list):
+                import json
+                formatted_json = json.dumps(raw_data, indent=2)
+                
+                # Add JSON with syntax highlighting
+                fmt.setForeground(self.colors['JSON'])
+                block_fmt = QTextBlockFormat()
+                block_fmt.setBackground(QColor(40, 40, 40))  # Slightly lighter background
+                cursor.setBlockFormat(block_fmt)
+                cursor.insertText(formatted_json + '\n', fmt)
+            else:
+                # For non-JSON raw data
+                fmt.setForeground(self.colors['RAW'])
+                cursor.insertText(str(raw_data) + '\n', fmt)
+        except:
+            fmt.setForeground(self.colors['RAW'])
+            cursor.insertText(str(raw_data) + '\n', fmt)
+    # Try to detect and format JSON in the text
+    elif ":" in text and ("{" in text or "[" in text):
+        parts = text.split(":", 1)
+        if len(parts) > 1 and (parts[1].strip().startswith("{") or parts[1].strip().startswith("[")):
+            try:
+                content = parts[1].strip()
+                import json
+                parsed = json.loads(content)
+                formatted_json = json.dumps(parsed, indent=2)
+                
+                # Add JSON with syntax highlighting
+                fmt.setForeground(self.colors['JSON'])
+                block_fmt = QTextBlockFormat()
+                block_fmt.setBackground(QColor(40, 40, 40))  # Slightly lighter background
+                cursor.setBlockFormat(block_fmt)
+                cursor.insertText(formatted_json + '\n', fmt)
+            except:
+                # If JSON parsing fails, just show the raw text
+                fmt.setForeground(self.colors['RAW'])
+                cursor.insertText(parts[1] + '\n', fmt)
+    else:
+        # For all other raw content
+        fmt.setForeground(self.colors['RAW'])
+        cursor.insertText('\n', fmt)  # Add extra line break for formatting

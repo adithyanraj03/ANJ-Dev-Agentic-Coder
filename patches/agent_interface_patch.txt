@@ -1,0 +1,116 @@
+AGENT INTERFACE PATCH
+
+Add this function after __init__ but before set_screen:
+
+def _wrap_text(self, text: str, width: int) -> List[str]:
+    """Helper method to wrap text to fit the screen."""
+    if not text:
+        return []
+        
+    words = text.split()
+    lines = []
+    current_line = []
+    current_length = 0
+    
+    for word in words:
+        # Check if adding this word would exceed the width
+        if current_length + len(word) + (1 if current_length > 0 else 0) <= width:
+            current_line.append(word)
+            current_length += len(word) + (1 if current_length > 0 else 0)
+        else:
+            # Line is full, start a new one
+            if current_line:
+                lines.append(' '.join(current_line))
+            current_line = [word]
+            current_length = len(word)
+    
+    # Add the last line if there's anything left
+    if current_line:
+        lines.append(' '.join(current_line))
+        
+    return lines
+
+-------------------------------------------------
+
+Change the "information" message display from:
+
+self.session_window.clear()
+self.session_window._draw_header("Information")
+self.session_window._draw_footer("Press any key to continue...")
+self.stdscr.addstr(2, 2, result.get('message', ''), curses.color_pair(1))
+
+To:
+
+self.session_window.clear()
+self.session_window._draw_header("Information")
+self.session_window._draw_footer("Press any key to continue...")
+                        
+# Use better text wrapping for messages
+message = result.get('message', '')
+height, width = self.stdscr.getmaxyx()
+wrapped_lines = self._wrap_text(message, width-6)
+                        
+for i, line in enumerate(wrapped_lines):
+    try:
+        self.stdscr.addstr(2+i, 2, line, curses.color_pair(1))
+    except curses.error:
+        break
+
+-------------------------------------------------
+
+Change the code update footer from:
+
+self.session_window._draw_footer("Press any key to continue...")
+
+To:
+
+self.session_window._draw_footer("Press any key to continue... (Y: accept, N: reject, E: edit)")
+
+-------------------------------------------------
+
+Change the run command footer from:
+
+self.session_window._draw_footer("Press Y to run, N to skip...")
+
+To:
+
+self.session_window._draw_footer("Press Y to run, N to skip, E to edit command...")
+
+-------------------------------------------------
+
+Add code to handle the "E" option for editing commands. After:
+
+key = self.stdscr.getch()
+if chr(key).lower() == 'y':
+    # Run the command
+    self.session_window.start_loading(f"Running: {command}")
+
+Add:
+
+elif chr(key).lower() == 'e':
+    # Edit the command
+    self.session_window.clear()
+    self.session_window._draw_header("Edit Command")
+    edited_command = self.get_input("Edit command", 2, 2)
+    
+    if edited_command:
+        command = edited_command
+        # Run the edited command
+        self.session_window.start_loading(f"Running: {command}")
+        
+        try:
+            import subprocess
+            proc = subprocess.run(
+                command, 
+                shell=True, 
+                cwd=str(self.agent.project_path),
+                capture_output=True,
+                text=True
+            )
+            
+            # [Rest of the command execution code]
+        
+        except Exception as cmd_err:
+            self.session_window.stop_loading()
+            self.session_window.show_error(f"Error running command: {cmd_err}")
+            self.stdscr.getch()

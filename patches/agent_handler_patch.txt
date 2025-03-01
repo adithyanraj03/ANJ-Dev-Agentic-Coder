@@ -1,0 +1,218 @@
+AGENT HANDLER PATCH
+
+Add these methods to add new action types for better codebase exploration:
+
+def _list_directory(self, action: Dict[str, Any]) -> Dict[str, Any]:
+    """List files in a directory."""
+    from agent_utils import get_directory_structure, log_detailed
+    
+    path = action.get("path", ".")
+    max_depth = action.get("max_depth", 2)
+    
+    # Ensure path is relative to project directory
+    dir_path = self.project_path / path
+    
+    try:
+        if not dir_path.exists() or not dir_path.is_dir():
+            return {
+                "success": False,
+                "action": "list_directory",
+                "error": f"Directory not found: {path}"
+            }
+            
+        structure = get_directory_structure(str(dir_path), max_depth)
+        log_detailed(f"Listed directory structure for {path}", "DEBUG")
+            
+        return {
+            "success": True,
+            "action": "list_directory",
+            "path": str(dir_path),
+            "structure": structure,
+            "message": f"Listed directory: {path}"
+        }
+    except Exception as e:
+        logging.error(f"Error listing directory {path}: {e}")
+        return {
+            "success": False,
+            "action": "list_directory",
+            "error": str(e)
+        }
+
+def _find_files_action(self, action: Dict[str, Any]) -> Dict[str, Any]:
+    """Find files matching a pattern."""
+    from agent_utils import find_files, log_detailed
+    
+    pattern = action.get("pattern", "*")
+    path = action.get("path", ".")
+    
+    # Ensure path is relative to project directory
+    base_path = self.project_path / path
+    
+    try:
+        if not base_path.exists() or not base_path.is_dir():
+            return {
+                "success": False,
+                "action": "find_files",
+                "error": f"Directory not found: {path}"
+            }
+            
+        files = find_files(str(base_path), pattern)
+        
+        # Make paths relative to the project
+        rel_files = [os.path.relpath(f, str(self.project_path)) for f in files]
+        log_detailed(f"Found {len(files)} files matching pattern {pattern}", "DEBUG", {"count": len(files), "pattern": pattern})
+            
+        return {
+            "success": True,
+            "action": "find_files",
+            "path": str(base_path),
+            "pattern": pattern,
+            "files": rel_files,
+            "message": f"Found {len(files)} files matching '{pattern}' in {path}"
+        }
+    except Exception as e:
+        logging.error(f"Error finding files with pattern {pattern}: {e}")
+        return {
+            "success": False,
+            "action": "find_files",
+            "error": str(e)
+        }
+
+def _search_code_action(self, action: Dict[str, Any]) -> Dict[str, Any]:
+    """Search for a pattern in code files."""
+    from agent_utils import search_code, log_detailed
+    
+    pattern = action.get("pattern", "")
+    path = action.get("path", ".")
+    
+    if not pattern:
+        return {
+            "success": False,
+            "action": "search_code",
+            "error": "No search pattern provided"
+        }
+        
+    # Ensure path is relative to project directory
+    base_path = self.project_path / path
+    
+    try:
+        if not base_path.exists() or not base_path.is_dir():
+            return {
+                "success": False,
+                "action": "search_code",
+                "error": f"Directory not found: {path}"
+            }
+            
+        results = search_code(str(base_path), pattern)
+        log_detailed(f"Searched code for pattern '{pattern}'", "DEBUG", {"matches_in_files": len(results)})
+            
+        return {
+            "success": True,
+            "action": "search_code",
+            "path": str(base_path),
+            "pattern": pattern,
+            "results": results,
+            "message": f"Found matches in {len(results)} files for pattern '{pattern}'"
+        }
+    except Exception as e:
+        logging.error(f"Error searching code for pattern {pattern}: {e}")
+        return {
+            "success": False,
+            "action": "search_code",
+            "error": str(e)
+        }
+
+def _explore_codebase_action(self, action: Dict[str, Any]) -> Dict[str, Any]:
+    """Explore the codebase to build context."""
+    query = action.get("query", "")
+    
+    try:
+        # Use the existing explore_codebase method
+        result = self.explore_codebase(query)
+        
+        # Format the response for LLM consumption
+        return {
+            "success": True,
+            "action": "explore_codebase",
+            "query": query,
+            "files_found": len(result.get("files", [])),
+            "structure": result.get("structure", {}),
+            "message": f"Explored codebase with {len(result.get('files', []))} relevant files"
+        }
+    except Exception as e:
+        logging.error(f"Error exploring codebase: {e}")
+        return {
+            "success": False,
+            "action": "explore_codebase",
+            "error": str(e)
+        }
+
+-------------------------------------------------
+
+Modify the execute_action method to add these new action types:
+
+def _execute_action(self, action: Dict[str, Any], stdscr=None) -> Dict[str, Any]:
+    """Execute a single action and return the result."""
+    action_type = action.get("type")
+    
+    # Import logging functions if available
+    try:
+        from agent_utils import log_action_start, log_action_end
+        log_action_start(f"Execute action: {action_type}")
+    except ImportError:
+        pass
+    
+    result = None
+    try:
+        if action_type == "create_file":
+            result = self._create_file(action)
+        elif action_type == "read_file":
+            result = self._read_file(action)
+        elif action_type == "edit_file":
+            result = self._edit_file(action, stdscr)
+        elif action_type == "run_command":
+            result = self._run_command(action)
+        elif action_type == "browse_url":
+            result = self._browse_url(action)
+        elif action_type == "search_web":
+            result = self._search_web(action)
+        elif action_type == "analyze_code":
+            result = self._analyze_code(action, stdscr)
+        # New action types
+        elif action_type == "list_directory":
+            result = self._list_directory(action)
+        elif action_type == "find_files":
+            result = self._find_files_action(action)
+        elif action_type == "search_code":
+            result = self._search_code_action(action)
+        elif action_type == "explore_codebase":
+            result = self._explore_codebase_action(action)
+        else:
+            result = {
+                "success": False,
+                "type": action_type,
+                "message": f"Unknown action type: {action_type}"
+            }
+            
+        # Log action result if logging functions are available
+        try:
+            from agent_utils import log_action_end
+            success = result.get("success", False) if result else False
+            log_action_end(f"Execute action: {action_type}", success)
+        except ImportError:
+            pass
+            
+        return result
+    except Exception as e:
+        logging.error(f"Error executing action {action_type}: {e}")
+        try:
+            from agent_utils import log_action_end
+            log_action_end(f"Execute action: {action_type}", False, {"error": str(e)})
+        except ImportError:
+            pass
+            
+        return {
+            "success": False,
+            "type": action_type or "unknown",
+            "message": f"Error executing action: {e}"
+        }
